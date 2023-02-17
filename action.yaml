@@ -35,6 +35,7 @@ runs:
       env:
         ENVIRONMENT: ${{ inputs.environment }}
         SERVICE_NAME: ${{ inputs.service }}
+      shell: bash
       run: |
         aws ecs describe-task-definition --task-definition $SERVICE_NAME-$ENVIRONMENT-definition --query taskDefinition > task-definition.json
     - name: Fill in the new image ID
