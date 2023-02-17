@@ -46,5 +46,5 @@ runs:
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         service: ${{ inputs.service-name }}
-        cluster: ${{ inputs.environment }}-services
+        cluster: ${{ inputs.environment }}-admin
         wait-for-service-stability: false
