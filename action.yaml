@@ -22,19 +22,13 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        role-to-assume: ${{ inputs.role }}
-        #role-session-name: MySessionName # Optional
-        aws-region: ${{ inputs.aws-region }}
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
     - name: Download task definition
       env:
         ENVIRONMENT: ${{ inputs.environment }}
-        SERVICE_NAME: ${{ inputs.service }}
+        SERVICE_NAME: ${{ inputs.service-name }}
       shell: bash
       run: |
         aws ecs describe-task-definition --task-definition $SERVICE_NAME-$ENVIRONMENT-definition --query taskDefinition > task-definition.json
@@ -43,7 +37,7 @@ runs:
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: task-definition.json
-        container-name: ${{ inputs.service }}-container
+        container-name: ${{ inputs.service-name }}-container
         image: ${{ steps.login-ecr.outputs.registry }}/${{ env.REPOSITORY }}:${{ github.sha }}
     - name: Deploy new task revision
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
@@ -51,6 +45,6 @@ runs:
         ENVIRONMENT: ${{ inputs.environment }}
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ inputs.service }}
+        service: ${{ inputs.service-name }}
         cluster: ${{ inputs.environment }}-services
         wait-for-service-stability: false
